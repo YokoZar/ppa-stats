@@ -1,0 +1,28 @@
+COPYRIGHT: Scott Ritchie <scottritchie@ubuntu.com>
+LICENSE: GPL-3+, see LICENSE file.
+
+usage: ppa-stats [-h] [-p PACKAGE] [-s SERIES] [-a ARCH] [-l] [--version] PPA
+
+Prints download statistics for binary packages in a Launchpad PPA.
+
+positional arguments:
+  PPA                   full name of the Launchpad PPA including the owning
+                        team or user and a slash, as in "PPA-Owner/PPA-Name"
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PACKAGE, --package PACKAGE
+                        specify a package name (default: any)
+  -s SERIES, --series SERIES
+                        specify a series name (default: any)
+  -a ARCH, --arch ARCH  specify an architecture (default: any)
+  -l, --login           login to launchpad non-anonymously (required for
+                        private PPAs)
+  --version             show program's version number and exit
+
+The -p, -s, and -a arguments can all be given multiple times, or as a comma-
+seperated list. Note that Launchpad is unable to provide individual release
+information for packages which are binary copied from one release to another.
+In such a case, the given number will represent the sum of downloads across
+all releases sharing that binary package.
+
