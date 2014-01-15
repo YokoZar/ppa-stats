@@ -31,7 +31,9 @@ parser.add_argument('-l', '--login',
                     help='login to launchpad non-anonymously (required for private PPAs)', 
                     action='store_true')
 parser.add_argument('--version', action='version', version=VERSION)
-parser.add_argument('PPA')
+parser.add_argument('PPA',
+                    help='full name of the Launchpad PPA including the owning team or user and \
+                          a slash, as in "PPA-Owner/PPA-Name"')
 
 args = parser.parse_args()
 try:
