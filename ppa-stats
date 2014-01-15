@@ -1,0 +1,91 @@
+#!/usr/bin/python
+import sys
+import os
+import argparse
+from launchpadlib.launchpad import Launchpad
+from lazr.restfulclient.errors import ServerError
+
+VERSION = "ppa-stats 1.0"
+DESCRIPTION = "Prints download statistics for binary packages in a Launchpad PPA."
+HELP_END = """
+    The -p, -s, and -a arguments can all be given multiple times, or as a comma-seperated
+    list. 
+    Note that Launchpad is unable to provide individual release information for packages
+    which are binary copied from one release to another.  In such a case, the given number
+    will represent the sum of downloads across all releases sharing that binary package.
+    """
+
+# TODO: implement an argument for specifying days, via 
+# getDailyDownloadTotals(start_date='2011-09-22', end_date='2011-09-23')
+parser = argparse.ArgumentParser(prog='ppa-stats', description=DESCRIPTION, epilog=HELP_END)
+parser.add_argument('-p', '--package',
+                    help='specify a package name (default: all)',
+                    action='append')
+parser.add_argument('-s', '--series',
+                    help='specify a series name (default: all)',
+                    action='append')
+parser.add_argument('-a', '--arch',
+                    help='specify an architecture (default: all)',
+                    action='append')
+parser.add_argument('-l', '--login',
+                    help='login to launchpad non-anonymously (required for private PPAs)', 
+                    action='store_true')
+parser.add_argument('--version', action='version', version=VERSION)
+parser.add_argument('PPA')
+
+args = parser.parse_args()
+try:
+    ppa_owner, ppa_name = args.PPA.split('/')
+except ValueError:
+    parser.error("Malformed PPA name '%s': Try ppa-owner/ppa-name" % args.PPA)
+
+# Creates a list of strings into a list, eg ['foo', 'bar,', 'x,y,z'] -> ['foo','bar','x','y','z']
+def list_from_comma_items(items):
+    output = []
+    for item in items:
+        output.extend(item.split(','))
+    return set(output)
+
+# We use sets to avoid duplication, especially the unexpected -p wine -p wine1.6 giving 2x wine1.6
+if args.package is not None: package_whitelist = set(list_from_comma_items(args.package))
+if args.arch is not None: arch_whitelist = set(list_from_comma_items(args.arch))
+if args.series is not None: series_whitelist = set(list_from_comma_items(args.series))
+
+
+# Login to Launchpad
+cache_path = os.path.expanduser("~/.launchpadlib/cache/")
+if args.login:
+    lp = Launchpad.login_with('ppastats', 'production', cache_path)
+else:
+    lp = Launchpad.login_anonymously('ppastats', 'production', cache_path)
+ppa = lp.people[ppa_owner].getPPAByName(name=ppa_name)
+
+
+# Build the list of binaries to query
+if args.package is None:
+    binaries = ppa.getPublishedBinaries(status='Published')
+else:
+    all_binaries = [] 
+    for package in package_whitelist:
+        all_binaries.extend(ppa.getPublishedBinaries(status='Published', binary_name=package))
+    # LP will return more than we ask above, eg wine1.7-amd64 when you asked for wine1.7
+    binaries = [x for x in all_binaries if x.binary_package_name in package_whitelist]
+
+
+# TODO: consider making some attempt to order them, eg in arg order for individual packages
+for binary in binaries:
+    splitted = binary.distro_arch_series_link.split("/");
+    series = splitted[-2]
+    arch = splitted[-1]
+    if args.series and series not in series_whitelist: continue
+    if args.arch and arch not in arch_whitelist: continue
+
+    try: 
+        downloadCount = binary.getDownloadCount()
+    except ServerError:
+        sys.stderr.write("Server Error: If this was a large PPA with many packages, try \
+                          restricting your query with -p, -s, or -a")
+        sys.exit()
+
+    print ("%s %s %s %d") % (binary.binary_package_name, series, arch, downloadCount)
+
