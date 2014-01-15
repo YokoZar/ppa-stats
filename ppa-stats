@@ -19,13 +19,13 @@ HELP_END = """
 # getDailyDownloadTotals(start_date='2011-09-22', end_date='2011-09-23')
 parser = argparse.ArgumentParser(prog='ppa-stats', description=DESCRIPTION, epilog=HELP_END)
 parser.add_argument('-p', '--package',
-                    help='specify a package name (default: all)',
+                    help='specify a package name (default: any)',
                     action='append')
 parser.add_argument('-s', '--series',
-                    help='specify a series name (default: all)',
+                    help='specify a series name (default: any)',
                     action='append')
 parser.add_argument('-a', '--arch',
-                    help='specify an architecture (default: all)',
+                    help='specify an architecture (default: any)',
                     action='append')
 parser.add_argument('-l', '--login',
                     help='login to launchpad non-anonymously (required for private PPAs)', 
