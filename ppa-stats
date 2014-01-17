@@ -46,7 +46,7 @@ def list_from_comma_items(items):
     output = []
     for item in items:
         output.extend(item.split(','))
-    return set(output)
+    return output
 
 # We use sets to avoid duplication, especially the unexpected -p wine -p wine1.6 giving 2x wine1.6
 if args.package is not None: package_whitelist = set(list_from_comma_items(args.package))
