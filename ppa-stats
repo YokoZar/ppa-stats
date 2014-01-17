@@ -57,6 +57,7 @@ if args.series is not None: series_whitelist = set(list_from_comma_items(args.se
 # Login to Launchpad
 cache_path = os.path.expanduser("~/.launchpadlib/cache/")
 if args.login:
+    # note launchpadlib prints output about logging in here to standard out rather than stderr
     lp = Launchpad.login_with('ppastats', 'production', cache_path)
 else:
     lp = Launchpad.login_anonymously('ppastats', 'production', cache_path)
