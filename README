@@ -1,4 +1,4 @@
-COPYRIGHT: Scott Ritchie <scottritchie@ubuntu.com>
+COPYRIGHT: 2014 Scott Ritchie <scottritchie@ubuntu.com>
 LICENSE: GPL-3+, see LICENSE file.
 
 usage: ppa-stats [-h] [-p PACKAGE] [-s SERIES] [-a ARCH] [-l] [--version] PPA
