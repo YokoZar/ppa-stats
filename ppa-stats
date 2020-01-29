@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os
 import argparse
@@ -90,5 +90,5 @@ for binary in binaries:
                           restricting your query with -p, -s, or -a")
         sys.exit()
 
-    print ("%s %s %s %d") % (binary.binary_package_name, series, arch, downloadCount)
+    print (("%s %s %s %d") % (binary.binary_package_name, series, arch, downloadCount))
 
